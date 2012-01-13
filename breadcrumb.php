@@ -46,20 +46,20 @@ class Breadcrumb {
 	 */
 	protected static function initialise()
 	{
-		static::set_breadcrumb(static::$home['name'], static::$home['link']);
+		static::set(static::$home['name'], static::$home['link']);
 
 		$segments = \Uri::segments();
 		$link     = '';
 
 		foreach ($segments as $segment)
 		{
-			if (preg_match('/^([0-9])+$/', $segment) > 0)
+			if (preg_match('/^([0-9])+$/', $segment) > 0 or $segment === 'index')
 			{
 				continue;
 			}
 
 			$link .= '/'.$segment;
-			static::set_breadcrumb(\Str::ucwords(str_replace('_', ' ', $segment)), $link);
+			static::set(\Str::ucwords(str_replace('_', ' ', $segment)), $link);
 		}
 	}
 
@@ -71,7 +71,7 @@ class Breadcrumb {
 	 * @param intenger $index Index to replace itens
 	 * @return void
 	 */
-	public static function set_breadcrumb($title, $link = "", $index = null)
+	public static function set($title, $link = "", $index = null, $overwrite = true)
 	{
 		// trim the bastard
 		$title = trim($title);
@@ -85,7 +85,14 @@ class Breadcrumb {
 		}
 		else
 		{
-			static::$breadcrumb[$index] = array('title' => $title, 'link' => $link);
+			if ($overwrite === true)
+			{
+				static::$breadcrumb[$index] = array('title' => $title, 'link' => $link);
+			}
+			else
+			{
+				static::append($title, $link, $index);
+			}
 		}
 	}
 
@@ -95,10 +102,10 @@ class Breadcrumb {
 	 * @param intenger $index
 	 * @return void
 	 */
-	public static function unset_breadcrumb($index = null)
+	public static function remove($index = null)
 	{
 		unset(static::$breadcrumb[$index]);
-		$this->sort_array(static::$breadcrumb);
+		static::sort_array(static::$breadcrumb);
 	}
 
 	/**
@@ -108,7 +115,7 @@ class Breadcrumb {
 	 */
 	public static function create_links()
 	{
-		if (empty(static::$breadcrumb))
+		if (empty(static::$breadcrumb) or count(static::$breadcrumb) < 2)
 		{
 			return '';
 		}
@@ -131,13 +138,47 @@ class Breadcrumb {
 	}
 
 	/**
+	 * Set an item on breadcrumb without overwrite the index
+	 *
+	 * @param string $title Display Link
+	 * @param string $link Relative Link
+	 * @param intenger $index Index to replace itens
+	 * @return void
+	 */
+	protected static function append($title, $link = "", $index = null)
+	{
+		$breadcrumb = array();
+
+		if (is_null($index) or $index > count(static::$breadcrumb) - 1)
+		{
+			static::set($title, $link);
+		}
+
+		for ($i=0,$total=count(static::$breadcrumb); $i < $total; $i++)
+		{
+			if ($i === $index)
+			{
+				$breadcrumb[] = array('title' => $title, 'link' => $link);
+				$i--;
+				$index = null;
+			}
+			else
+			{
+				$breadcrumb[] = static::$breadcrumb[$i];
+			}
+		}
+
+		static::$breadcrumb = $breadcrumb;
+	}
+
+	/**
 	 * Sort the index of an array
 	 *
 	 * @return &$array Array to sort
 	 */
-	protected function sort_array(&$array)
-    {
-    	if(is_array($array))
+	protected static function sort_array(&$array)
+	{
+		if(is_array($array))
 		{
 			$aux = array();
 			foreach ($array as $value)
@@ -147,5 +188,5 @@ class Breadcrumb {
 
 			$array = $aux;
 		}
-    }
+	}
 }
