@@ -109,6 +109,16 @@ class Breadcrumb {
 	}
 
 	/**
+	 * Count number of items on breadcrumb
+	 *
+	 * @return int
+	 */
+	public static function count()
+	{
+		return count(static::$breadcrumb);
+	}
+
+	/**
 	 * Create Html structure for Breadcrumb
 	 *
 	 * @return string The html
