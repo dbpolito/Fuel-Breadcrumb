@@ -1,12 +1,18 @@
 <?php
 /**
- * Created by dbpolito | contato@dbpolito.net
+ * Breadcrumb solution
  *
+ * @version    0.2
+ * @author     Daniel Polito - @dbpolito
  */
 
 class Breadcrumb {
 
 	protected static $breadcrumb = array();
+
+	protected static $auto_render = true;
+
+	protected static $use_lang = false;
 
 	protected static $home = array('name' => 'Home', 'link' => '/');
 
@@ -29,11 +35,12 @@ class Breadcrumb {
 	 */
 	public static function _init()
 	{
-		$config = \Config::load('breadcrumb');
-		static::$home = $config['home'];
-		static::$template = array_merge(static::$template, $config['template']);
+		\Config::load('breadcrumb', 'breadcrumb');
 
-		static::initialise();
+		if (\Config::get('breadcrumb.auto_render', static::$auto_render) === true)
+		{
+			static::initialise();
+		}
 	}
 
 	/**
@@ -46,7 +53,10 @@ class Breadcrumb {
 	 */
 	protected static function initialise()
 	{
-		static::set(static::$home['name'], static::$home['link']);
+		$home = \Config::get('breadcrumb.home', static::$home);
+		$use_lang = \Config::get('breadcrumb.use_lang', static::$use_lang);
+
+		static::set($home['name'], $home['link']);
 
 		$segments = \Uri::segments();
 		$link     = '';
@@ -59,7 +69,15 @@ class Breadcrumb {
 			}
 
 			$link .= '/'.$segment;
-			static::set(\Str::ucwords(str_replace('_', ' ', $segment)), $link);
+
+			if ($use_lang === true)
+			{
+				static::set(\Lang::get($segment), $link);
+			}
+			else
+			{
+				static::set(\Str::ucwords(str_replace('_', ' ', $segment)), $link);
+			}
 		}
 	}
 
@@ -130,19 +148,21 @@ class Breadcrumb {
 			return '';
 		}
 
-		$output = static::$template["wrapper_start"];
+		$template = \Config::get('breadcrumb.template', static::$template);
 
-		for ($i=0,$total=count(static::$breadcrumb); $i < $total; $i++)
+		$output = $template["wrapper_start"];
+
+		for ($i=0,$total=static::count(); $i < $total; $i++)
 		{
 			$is_last = ($i === $total - 1);
 
-			$output .= ($is_last) ? static::$template["item_start_active"] : static::$template["item_start"];
+			$output .= ($is_last) ? $template["item_start_active"] : $template["item_start"];
 			$output .= ($is_last) ? static::$breadcrumb[$i]["title"] : \Html::anchor(static::$breadcrumb[$i]["link"], static::$breadcrumb[$i]["title"]);
-			$output .= ($is_last) ? "" : static::$template["divider"];
-			$output .= static::$template["item_end"];
+			$output .= ($is_last) ? "" : $template["divider"];
+			$output .= $template["item_end"];
 		}
 
-		$output .= static::$template['wrapper_end'];
+		$output .= $template['wrapper_end'];
 
 		return $output;
 	}
