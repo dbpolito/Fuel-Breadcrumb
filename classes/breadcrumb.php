@@ -1,6 +1,6 @@
 <?php
 
-namespace Message;
+namespace Breadcrumb;
 
 /**
  * Breadcrumb solution
