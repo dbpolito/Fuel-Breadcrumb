@@ -146,7 +146,7 @@ class Breadcrumb {
 	 */
 	public static function create_links()
 	{
-		if (empty(static::$breadcrumb) or count(static::$breadcrumb) < 2)
+		if (! \Config::get('breadcrumb.display_always', false) and (empty(static::$breadcrumb) or count(static::$breadcrumb) < 2))
 		{
 			return '';
 		}

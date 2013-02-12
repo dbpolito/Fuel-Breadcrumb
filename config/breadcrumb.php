@@ -35,6 +35,8 @@ return array(
 		'item_end' => '</li>',
 		'divider' => '<span class="divider">/</span>'
 	),
+	
+	'display_always' => false
 
 );
 
