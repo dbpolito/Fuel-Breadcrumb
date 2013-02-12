@@ -73,13 +73,16 @@ class Breadcrumb {
 
 			$link .= '/'.$segment;
 
-			if ($use_lang === true)
+			if(! in_array($segment, \Config::get('breadcrumb.ignore_segments', array())))
 			{
-				static::set(\Lang::get($segment), $link);
-			}
-			else
-			{
-				static::set(\Str::ucwords(str_replace('_', ' ', $segment)), $link);
+				if ($use_lang === true)
+				{
+					static::set(\Lang::get($segment), $link);
+				}
+				else
+				{
+					static::set(\Str::ucwords(str_replace('_', ' ', $segment)), $link);
+				}
 			}
 		}
 	}
@@ -146,7 +149,7 @@ class Breadcrumb {
 	 */
 	public static function create_links()
 	{
-		if (empty(static::$breadcrumb) or count(static::$breadcrumb) < 2)
+		if (! \Config::get('breadcrumb.display_always', false) and (empty(static::$breadcrumb) or count(static::$breadcrumb) < 2))
 		{
 			return '';
 		}

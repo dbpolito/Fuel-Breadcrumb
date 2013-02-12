@@ -12,6 +12,7 @@ return array(
 	 * Auto Populate Breadcrumb based on routes
 	 */
 	'auto_populate' => true,
+	'ignore_segments' => array(),
 
 	/**
 	 * If true the class will call ONLY ON AUTO POPULATING Lang::get() to each item
@@ -35,6 +36,8 @@ return array(
 		'item_end' => '</li>',
 		'divider' => '<span class="divider">/</span>'
 	),
+	
+	'display_always' => false
 
 );
 
