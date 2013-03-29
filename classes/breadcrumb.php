@@ -38,7 +38,7 @@ class Breadcrumb {
 	 */
 	public static function _init()
 	{
-		\Config::load('breadcrumb', 'breadcrumb');
+		\Config::load('breadcrumb', true, true);
 
 		if (\Config::get('breadcrumb.auto_render', static::$auto_render) === true)
 		{
