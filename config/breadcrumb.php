@@ -23,7 +23,7 @@ return array(
 	/**
 	 * Home Link
 	 */
-	'home' => array('name' => 'Início', 'link' => '/'),
+	'home' => array('name' => 'Номе', 'link' => '/'),
 
 	/**
 	 * Template Structure
