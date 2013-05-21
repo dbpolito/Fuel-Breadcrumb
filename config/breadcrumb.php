@@ -19,6 +19,8 @@ return array(
 	 * of breadcrumb and WILL NOT ucwords and replace underscores to spaces
 	 */
 	'use_lang' => false,
+	'lang_file' => null,
+	'lang_prefix' => null,
 
 	/**
 	 * Home Link
@@ -36,7 +38,7 @@ return array(
 		'item_end' => '</li>',
 		'divider' => '<span class="divider">/</span>'
 	),
-	
+
 	'display_always' => false
 
 );
