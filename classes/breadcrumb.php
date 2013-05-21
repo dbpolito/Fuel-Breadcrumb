@@ -17,6 +17,10 @@ class Breadcrumb {
 
 	protected static $use_lang = false;
 
+	protected static $lang_file = null;
+
+	protected static $lang_prefix = null;
+
 	protected static $home = array('name' => 'Home', 'link' => '/');
 
 	protected static $template = array(
@@ -59,7 +63,10 @@ class Breadcrumb {
 		$home = \Config::get('breadcrumb.home', static::$home);
 		$use_lang = \Config::get('breadcrumb.use_lang', static::$use_lang);
 
-		static::set($home['name'], $home['link']);
+		if ($use_lang === true)
+		{
+			static::set(static::translate($home['name']), $home['link']);
+		}
 
 		$segments = \Uri::segments();
 		$link     = '';
@@ -77,7 +84,7 @@ class Breadcrumb {
 			{
 				if ($use_lang === true)
 				{
-					static::set(\Lang::get($segment), $link);
+					static::set(static::translate($segment), $link);
 				}
 				else
 				{
@@ -85,6 +92,26 @@ class Breadcrumb {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Try to translate the desired string taking account of the config
+	 *
+	 * @access protected
+	 * @param  string $string The string to be translate
+	 * @return string
+	 */
+	protected static function translate($string)
+	{
+		$lang_file = \Config::get('breadcrumb.lang_file', static::$lang_file);
+		$lang_prefix = \Config::get('breadcrumb.lang_prefix', static::$lang_prefix);
+
+		empty($lang_file) or \Lang::load($lang_file, true);
+
+		empty($lang_prefix) or $string = $lang_prefix.'.'.$string;
+		empty($lang_file) or $string = $lang_file.'.'.$string;
+
+		return \Lang::get($string);
 	}
 
 	/**
