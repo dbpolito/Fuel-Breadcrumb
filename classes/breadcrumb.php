@@ -62,10 +62,18 @@ class Breadcrumb {
 	{
 		$home = \Config::get('breadcrumb.home', static::$home);
 		$use_lang = \Config::get('breadcrumb.use_lang', static::$use_lang);
+		$ignored = \Config::get('breadcrumb.ignore_segments', array());
 
-		if ($use_lang === true)
+		if (! in_array('home', $ignored))
 		{
-			static::set(static::translate($home['name']), $home['link']);
+			if ($use_lang === true)
+			{
+				static::set(static::translate($home['name']), $home['link']);
+			}
+			else
+			{
+				static::set($home['name'], $home['link']);
+			}
 		}
 
 		$segments = \Uri::segments();
@@ -80,7 +88,7 @@ class Breadcrumb {
 
 			$link .= '/'.$segment;
 
-			if(! in_array($segment, \Config::get('breadcrumb.ignore_segments', array())))
+			if(! in_array($segment, $ignored)))
 			{
 				if ($use_lang === true)
 				{
